@@ -24,12 +24,11 @@ public class TravelpathProperties extends BottomSheetDialogFragment {
                                  @Nullable Bundle savedInstanceState) {
 
             View view = inflater.inflate(R.layout.travelpath_properties, container, false);
-
-
-
             Button confirme = view.findViewById(R.id.confirm);
             ChipGroup chipAct = view.findViewById(R.id.chipAct);
 
+            //Fermer la fenêtre prop
+            //TODO : enregistrer les info et déclencher algo de recherche de chemin
             confirme.setOnClickListener(v ->{
                 dismiss();
             });
@@ -38,7 +37,7 @@ public class TravelpathProperties extends BottomSheetDialogFragment {
                     "Restauration", "Loisirs", "Culture"
             };
 
-
+            //Setup les bouton options des type activités obligatoire
             for (String act : activites) {
                 Chip chip = new Chip(requireContext());
                 chip.setText(act);
