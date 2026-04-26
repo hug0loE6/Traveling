@@ -1,30 +1,50 @@
 package com.example.traveling;
 
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.room.Room;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap lamap;
+    private List<Lieux> lesLieux = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Chargement des lieux de la BDD (et init si premier lancement) dans la variable utilisé plus tard pour maps
+        BDDLieux bdd = BDDLieux.getInstance(this);
+        LieuxDao dao = bdd.getDao();
+        new Thread(() -> {
+            List<Lieux> data = dao.getAllUsers();
+            runOnUiThread(() -> {
+                lesLieux.clear();
+                lesLieux.addAll(data);
+            });
+        }).start();
 
         //Permet au bouton d'ouvrir la fenêtre de proprieté de la création du voyage
         ImageButton prop = findViewById(R.id.btnPropPath);
@@ -37,20 +57,31 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
-
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         lamap = googleMap;
 
-        // Coordonnées de test (ex: Paris)
-        LatLng paris = new LatLng(0.0, 0.0);
+        try {
+            boolean success = googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.map_style));
+            if (!success) {
+                Log.e("MapError", "Échec de l'analyse du style.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e("MapError", "Impossible de trouver le fichier de style.", e);
+        }
 
-        // Ajouter un marqueur
-        lamap.addMarker(new MarkerOptions().position(paris).title("le 0 0"));
 
-        // Déplacer la caméra avec un zoom (15 = niveau rue, 20 = très proche)
-        lamap.moveCamera(CameraUpdateFactory.newLatLngZoom(paris, 15f));
+        Log.d("bdddddd", "Ok la je vais lireeeeeeeee");
+        for (Lieux l: lesLieux) {
+            Log.d("MaBaseDeDonnees", l.toString());
+            LatLng cord = new LatLng(l.lat, l.lng);
+            lamap.addMarker(new MarkerOptions().position(cord).title(l.nom));
+        }
+
+        lamap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.61093, 3.87635), 15f));
     }
 }
