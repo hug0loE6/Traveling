@@ -30,6 +30,20 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap lamap;
     private List<Lieux> lesLieux = new ArrayList<>();
 
+    private void createMarker(){
+        if (lamap == null || lesLieux.isEmpty()){
+            Log.d("SYNCMARKER", "Status map : " + (lamap != null) + ", status liste Lieux : " + !lesLieux.isEmpty());
+            return;
+        }
+        for (Lieux l: lesLieux) {
+            Log.d("AffichageLieux", l.toString());
+            LatLng cord = new LatLng(l.lat, l.lng);
+            lamap.addMarker(new MarkerOptions().position(cord).title(l.nom));
+        }
+
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,9 +54,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         LieuxDao dao = bdd.getDao();
         new Thread(() -> {
             List<Lieux> data = dao.getAllUsers();
+            Log.d("DEBUG_ROOM", "Nombre récupéré : " + data.size());
             runOnUiThread(() -> {
-                lesLieux.clear();
-                lesLieux.addAll(data);
+                this.lesLieux = data;
+                createMarker();
             });
         }).start();
 
@@ -73,15 +88,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (Resources.NotFoundException e) {
             Log.e("MapError", "Impossible de trouver le fichier de style.", e);
         }
-
-
-        Log.d("bdddddd", "Ok la je vais lireeeeeeeee");
-        for (Lieux l: lesLieux) {
-            Log.d("MaBaseDeDonnees", l.toString());
-            LatLng cord = new LatLng(l.lat, l.lng);
-            lamap.addMarker(new MarkerOptions().position(cord).title(l.nom));
-        }
-
+        createMarker();
         lamap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.61093, 3.87635), 15f));
     }
 }
