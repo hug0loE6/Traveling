@@ -6,12 +6,12 @@ import java.util.List;
 
 @Dao
 public interface LieuxDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Lieux l);
 
-    @Query("SELECT * FROM lieux")
-    List<Lieux> getAllUsers();
+    @Query("DELETE FROM lieux")
+    void deleteAll();
 
-    @Delete
-    void delete(Lieux l);
+    @Query("SELECT * FROM lieux")
+    List<Lieux> getAll();
 }

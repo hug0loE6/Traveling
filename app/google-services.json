@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "249594299466",
+    "firebase_url": "https://traveling-ca73d-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "traveling-ca73d",
+    "storage_bucket": "traveling-ca73d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:249594299466:android:b9358a042897fde13a52b3",
+        "android_client_info": {
+          "package_name": "com.example.traveling"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUBDaogpH4gZUQBdY3yuv9scKog0Mb_jI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

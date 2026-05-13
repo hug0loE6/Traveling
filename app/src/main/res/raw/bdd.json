@@ -1,0 +1,22 @@
+{
+  "lieux": {
+    "l1": {
+      "nom": "Place de la Comédie",
+      "type": "Culture",
+      "lat": 43.6086,
+      "lng": 3.8797
+    },
+    "l2": {
+      "nom": "Zoo de Montpellier",
+      "type": "Loisirs",
+      "lat": 43.6433,
+      "lng": 3.8733
+    },
+    "l3": {
+      "nom": "Le Bistrok Montpellier",
+      "type": "Restauration",
+      "lat": 43.6121,
+      "lng": 3.8791
+    }
+  }
+}

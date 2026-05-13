@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -38,6 +39,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.room.runtime)
+    implementation(libs.firebase.database)
     annotationProcessor(libs.room.compiler)
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.material:material:1.11.0")

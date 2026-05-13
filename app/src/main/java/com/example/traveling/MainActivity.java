@@ -22,6 +22,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.firebase.database.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +42,44 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             LatLng cord = new LatLng(l.lat, l.lng);
             lamap.addMarker(new MarkerOptions().position(cord).title(l.nom));
         }
+    }
 
+    private void syncDataFirebase() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("lieux");
 
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                new Thread(() -> {
+                    List<Lieux> firebaseLieux = new ArrayList<>();
+                    for (DataSnapshot unLieu : snapshot.getChildren()) {
+                        Lieux lieu = unLieu.getValue(Lieux.class);
+                        firebaseLieux.add(lieu);
+                        String output = "Element lieux ajouté dans la liste firebase, value : " + lieu;
+                        Log.d("Firebase", output);
+                    }
+
+                    BDDLieux bdd = BDDLieux.getInstance(MainActivity.this);
+                    LieuxDao dao = bdd.getDao();
+                    dao.deleteAll();
+                    Log.d("DEBUG_ROOM", "Nombre récupéré : " + firebaseLieux.size());
+
+                    for (Lieux l : firebaseLieux) {
+                        dao.insert(l);
+                    }
+
+                    runOnUiThread(() -> {
+                        MainActivity.this.lesLieux = firebaseLieux;
+                        createMarker();
+                    });
+                }).start();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Firebase", "Erreur de sync", error.toException());
+            }
+        });
     }
 
     @Override
@@ -49,17 +87,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         //Chargement des lieux de la BDD (et init si premier lancement) dans la variable utilisé plus tard pour maps
-        BDDLieux bdd = BDDLieux.getInstance(this);
-        LieuxDao dao = bdd.getDao();
-        new Thread(() -> {
-            List<Lieux> data = dao.getAllUsers();
-            Log.d("DEBUG_ROOM", "Nombre récupéré : " + data.size());
-            runOnUiThread(() -> {
-                this.lesLieux = data;
-                createMarker();
-            });
-        }).start();
+        syncDataFirebase();
 
         //Permet au bouton d'ouvrir la fenêtre de proprieté de la création du voyage
         ImageButton prop = findViewById(R.id.btnPropPath);

@@ -12,6 +12,8 @@ public class Lieux {
     public double lat;
     public double lng;
 
+    public Lieux(){}
+
     @NonNull
     @Override
     public String toString() {
