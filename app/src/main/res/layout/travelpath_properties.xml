@@ -14,14 +14,33 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"/>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="300dp">
+        android:layout_height="300dp"
+        android:fillViewport="true">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lieu(x) obligatoire(s) :"
+                android:textSize="15sp"/>
+
+            <Spinner
+                android:id="@+id/spinnerLieux"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipLieux"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -36,15 +55,17 @@
                 android:padding="8dp"/>
 
             <EditText
+                android:id="@+id/duration"
                 android:textColor="@color/black"
                 android:background="@drawable/propedittext"
-                android:hint="Durée approximative du parcours en minute"
+                android:hint="Durée du parcours en minute"
                 android:inputType="number"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginBottom="10dp"/>
 
             <EditText
+                android:id="@+id/budget"
                 android:textColor="@color/black"
                 android:background="@drawable/propedittext"
                 android:hint="Budget à disposition en €"
@@ -55,7 +76,7 @@
 
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
     <Button
         android:layout_width="match_parent"
         android:layout_height="match_parent"

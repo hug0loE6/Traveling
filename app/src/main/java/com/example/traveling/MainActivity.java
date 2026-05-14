@@ -6,14 +6,8 @@ import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentActivity;
-import androidx.room.Room;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -158,8 +152,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     @Override
-    public void onDataSent(String data) {
-        Toast.makeText(this,data,Toast.LENGTH_SHORT).show();
+    public void onDataSent(PropertiesIt data) {
+        Toast.makeText(this,"send",Toast.LENGTH_SHORT).show();
+        Log.d("TESTDATA", "d="+data.duree+",b="+data.budget+",t="+data.type);
         genItineraire();
     }
 }

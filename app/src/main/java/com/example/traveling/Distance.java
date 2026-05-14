@@ -10,6 +10,7 @@ public class Distance {
     public Lieux from;
     public Lieux to;
     public double distance; // en km
+    public double temps; // en minute
 
     public Distance(Lieux from, Lieux to) {
         this.from = from;
@@ -19,7 +20,7 @@ public class Distance {
     @NonNull
     @Override
     public String toString() {
-        return "(" + from.nom + " -> " + to.nom + ") : " + distance;
+        return "(" + from.nom + " -> " + to.nom + ") : " + distance + " en " + temps;
     }
 
     public void calculerDistance() {
@@ -39,6 +40,11 @@ public class Distance {
         distance = 6371 * c; // en kilomètres
     }
 
+    public void calculTemps(){
+        if(distance == 0.0) return;
+        temps = ((distance*1.15)/4)*60;
+    }
+
     public static List<Distance> genToutDistance(List<Lieux> mesLieux, Lieux from){
         List<Distance> resultats = new ArrayList<>();
 
@@ -49,6 +55,7 @@ public class Distance {
             Distance thedist = new Distance(from, to);
 
             thedist.calculerDistance();
+            thedist.calculTemps();
 
             resultats.add(thedist);
         }
