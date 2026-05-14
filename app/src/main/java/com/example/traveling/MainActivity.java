@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -26,8 +27,9 @@ import com.google.firebase.database.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback, TravelpathProperties.OnConfimProp {
 
     private GoogleMap lamap;
     private List<Lieux> lesLieux = new ArrayList<>();
@@ -87,8 +89,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         //Chargement des lieux de la BDD (et init si premier lancement) dans la variable utilisé plus tard pour maps
         syncDataFirebase();
 
@@ -121,5 +121,45 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
         createMarker();
         lamap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.61093, 3.87635), 15f));
+    }
+
+    private void genItineraire() {
+        List<Lieux> itineraire = new ArrayList<>();
+        Random r = new Random();
+        Lieux depart = lesLieux.get(r.nextInt(lesLieux.size()));
+        List<Lieux> explorable = new ArrayList<>(lesLieux);
+        explorable.remove(depart);
+        itineraire.add(depart);
+
+        while (!explorable.isEmpty()) {
+            List<Distance> check = Distance.genToutDistance(explorable, itineraire.get(itineraire.size()-1));
+            Log.d("DEBUT_DIST", check.toString());
+            double mindist = Double.POSITIVE_INFINITY;
+            int index = 0;
+            for (int i = 0; i<check.size();i++){
+                double disttest = check.get(i).distance;
+                if(disttest < mindist){
+                    mindist = disttest;
+                    index = i;
+                }
+            }
+            Lieux nextstep = new Lieux();
+            for(Lieux l : explorable){
+                if (check.get(index).to == l) {
+                    nextstep = check.get(index).to;
+                    break;
+                }
+            }
+            explorable.remove(nextstep);
+            itineraire.add(nextstep);
+        }
+        Log.d("ITINERAIRE",itineraire.toString());
+    }
+
+
+    @Override
+    public void onDataSent(String data) {
+        Toast.makeText(this,data,Toast.LENGTH_SHORT).show();
+        genItineraire();
     }
 }

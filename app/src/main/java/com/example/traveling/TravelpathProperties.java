@@ -17,6 +17,22 @@ import com.google.android.material.chip.ChipGroup;
 
 public class TravelpathProperties extends BottomSheetDialogFragment {
 
+        public interface OnConfimProp {
+            void onDataSent(String data);
+        }
+
+        private OnConfimProp callback;
+
+        @Override
+        public void onAttach(@NonNull Context context) {
+            super.onAttach(context);
+            try {
+                callback = (OnConfimProp) context;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(context.toString() + " doit implémenter l'interface");
+            }
+        }
+
         @Nullable
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater,
@@ -29,7 +45,10 @@ public class TravelpathProperties extends BottomSheetDialogFragment {
 
             //Fermer la fenêtre prop
             //TODO : enregistrer les info et déclencher algo de recherche de chemin
-            confirme.setOnClickListener(v ->{
+            confirme.setOnClickListener(v -> {
+                if (callback != null) {
+                    callback.onDataSent("test");
+                }
                 dismiss();
             });
 
