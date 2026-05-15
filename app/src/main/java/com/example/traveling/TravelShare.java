@@ -20,6 +20,11 @@ public class TravelShare extends AppCompatActivity {
 
     private static final int LOGIN_REQUEST_CODE = 1;
 
+    private boolean isLoggedIn = false;
+    private String currentFirstname = null;
+
+    private User currentUser = null;
+
     private ImageButton loginButton;
     private RecyclerView recyclerView;
     private ArrayList<Post> posts;
@@ -41,10 +46,25 @@ public class TravelShare extends AppCompatActivity {
         loginButton = findViewById(R.id.loginButton);
 
         loginButton.setOnClickListener(v -> {
-            Toast.makeText(this, "click OK", Toast.LENGTH_SHORT).show();
 
-            Intent intent = new Intent(TravelShare.this, LoginActivity.class);
-            startActivityForResult(intent, LOGIN_REQUEST_CODE);
+            if (!isLoggedIn) {
+
+                Intent intent = new Intent(TravelShare.this, LoginActivity.class);
+                startActivityForResult(intent, LOGIN_REQUEST_CODE);
+
+            } else {
+
+                new androidx.appcompat.app.AlertDialog.Builder(TravelShare.this)
+                        .setTitle("Déconnexion")
+                        .setMessage("Voulez-vous vous déconnecter ?")
+                        .setPositiveButton("Oui", (dialog, which) -> {
+                            isLoggedIn = false;
+                            currentFirstname = null;
+                            loginButton.setImageResource(android.R.drawable.ic_menu_add);
+                        })
+                        .setNegativeButton("Non", null)
+                        .show();
+            }
         });
 
         // ===== RECYCLERVIEW FEED =====
@@ -54,22 +74,27 @@ public class TravelShare extends AppCompatActivity {
 
         posts = new ArrayList<>();
 
-        // Posts exemple
         posts.add(new Post(
                 "Alice",
                 "Premier post sur TravelShare !",
-                android.R.drawable.sym_def_app_icon
+                android.R.drawable.sym_def_app_icon,
+                "Paris, France",
+                "15/05/2026"
         ));
 
         posts.add(new Post(
                 "Bob",
                 "Découverte d’un endroit incroyable.",
-                android.R.drawable.sym_def_app_icon
+                android.R.drawable.sym_def_app_icon,
+                "Rome, Italie",
+                "12/05/2026"
         ));
 
         adapter = new PostAdapter(posts);
         recyclerView.setAdapter(adapter);
     }
+
+
 
     // ===== RETOUR LOGIN =====
     @Override
@@ -78,9 +103,11 @@ public class TravelShare extends AppCompatActivity {
 
         if (requestCode == LOGIN_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
 
-            String firstname = data.getStringExtra("firstname");
+            currentFirstname = data.getStringExtra("firstname");
+            String lastname = data.getStringExtra("lastname");
 
-            //loginButton.setText("");
+            isLoggedIn = true;
+
             loginButton.setImageResource(android.R.drawable.sym_def_app_icon);
         }
     }
