@@ -121,13 +121,19 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
         int breakloop = 0; //var de débug pour casser la boucle parce que j'ai 0 lieux de test vue que je suis un zgeg et que j'ai la giga flemme de mettre d'autre lieux de montpellier pour l'application traveling de l'UE Programmation mobile.
         while (true){
             List<Lieux> itineraire = new ArrayList<>();
+            List<String> obligatoirtodo = new ArrayList<>(data.lieux);
             Random r = new Random();
-            Lieux depart = lesLieux.get(r.nextInt(lesLieux.size()));
-            List<Lieux> explorable = new ArrayList<>(lesLieux);
+            List<Lieux> filtered = new ArrayList<>();
+            for(Lieux l : lesLieux){
+                if (data.type.contains(l.type)) filtered.add(l);
+            }
+            Lieux depart = filtered.get(r.nextInt(filtered.size()));
+            List<Lieux> explorable = new ArrayList<>(filtered);
             explorable.remove(depart);
             itineraire.add(depart);
+            obligatoirtodo.remove(depart.nom);
             int timetraj = 0;
-            int rembud = data.budget;
+            int rembud = data.budget - depart.budget;
 
             while (!explorable.isEmpty() && timetraj<data.duree && rembud>0) {
                 List<Distance> check = Distance.genToutDistance(itineraire.get(itineraire.size() - 1), explorable);
@@ -139,12 +145,19 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
                     }
                 }
                 List<Distance> potentialnextstep = new ArrayList<>();
+                Distance nextstep = new Distance();
                 for (Distance d : check) {
                     if (mindist * 1.25 > d.distance) {
                         potentialnextstep.add(d);
+                        if(obligatoirtodo.contains(d.to.nom)){
+                            obligatoirtodo.remove(d.to.nom);
+                            potentialnextstep.clear();
+                            nextstep = d;
+                            break;
+                        }
                     }
                 }
-                Distance nextstep = potentialnextstep.get(r.nextInt(potentialnextstep.size()));
+                if(!potentialnextstep.isEmpty()) nextstep = potentialnextstep.get(r.nextInt(potentialnextstep.size()));
                 explorable.remove(nextstep.to);
                 itineraire.add(nextstep.to);
                 timetraj = (int) Math.round(timetraj + nextstep.temps);
@@ -153,14 +166,15 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
             }
             Log.d("ITINERAIRE", itineraire.toString());
             breakloop++;
-            if (breakloop >= 30) {
-                Toast.makeText(this,"Trop long",Toast.LENGTH_SHORT).show();
+            if (breakloop >= 67) {
+                Toast.makeText(this,"Aucun trajet trouvé",Toast.LENGTH_SHORT).show();
                 break;
             }
             //check correspondance prop
             Log.d("DEBUG_IT", "timetraj= " + timetraj + ", rembud= " + rembud);
             if(!(data.duree*0.67 <= timetraj) || !(timetraj <= data.duree*1.33)) continue;
             if(rembud < 0) continue;
+            if(!obligatoirtodo.isEmpty()) continue;
 
             break;
         }

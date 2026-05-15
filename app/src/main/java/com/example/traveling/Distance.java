@@ -12,6 +12,8 @@ public class Distance {
     public double distance; // en km
     public double temps; // en minute
 
+    public Distance(){};
+
     public Distance(Lieux from, Lieux to) {
         this.from = from;
         this.to = to;

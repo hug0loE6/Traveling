@@ -20,6 +20,8 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class TravelpathProperties extends BottomSheetDialogFragment {
@@ -72,8 +74,10 @@ public class TravelpathProperties extends BottomSheetDialogFragment {
             ChipGroup chipLieu = view.findViewById(R.id.chipLieux);
             Spinner spinn = view.findViewById(R.id.spinnerLieux);
 
+            String[] activites = {
+                    "Restauration", "Loisirs", "Culture"
+            };
             //Fermer la fenêtre prop et enregistre les info et déclencher algo de recherche de chemin
-            //TODO : remplir propit des lieux obligatoires (et aussi update propit)
             confirme.setOnClickListener(v -> {
                 if (callback != null) {
                     List<String> t = new ArrayList<>();
@@ -82,6 +86,9 @@ public class TravelpathProperties extends BottomSheetDialogFragment {
                         if (caac instanceof Chip && caac.isSelected()) {
                             t.add(((Chip) caac).getText().toString());
                         }
+                    }
+                    if(t.isEmpty()){
+                        Collections.addAll(t, activites);
                     }
                     List<String> l = new ArrayList<>();
                     for (int i = 0; i < chipLieu.getChildCount(); i++) {
@@ -103,10 +110,6 @@ public class TravelpathProperties extends BottomSheetDialogFragment {
                 }
 
             });
-
-            String[] activites = {
-                    "Restauration", "Loisirs", "Culture"
-            };
 
             //Setup les bouton options des type activités obligatoire
             for (String act : activites) {
