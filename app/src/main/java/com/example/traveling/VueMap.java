@@ -3,10 +3,13 @@ package com.example.traveling;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,6 +20,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.database.*;
 
 import java.util.ArrayList;
@@ -27,6 +31,7 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
 
     private GoogleMap lamap;
     private List<Lieux> lesLieux = new ArrayList<>();
+    private BottomSheetBehavior<FrameLayout> behavior;
 
     private void createMarker(){
         if (lamap == null || lesLieux.isEmpty()){
@@ -78,6 +83,30 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
         });
     }
 
+    public void openDisplay() {
+        FrameLayout container = findViewById(R.id.displayIt);
+        container.setVisibility(View.VISIBLE);
+        behavior.setHideable(false);
+        DisplayItineraire fragment = new DisplayItineraire();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.displayIt, fragment)
+                .commit();
+        behavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+    }
+
+    public void closeDisplay() {
+        behavior.setHideable(true);
+        behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.displayIt);
+        if (fragment != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .remove(fragment)
+                    .commit();
+        }
+        FrameLayout container = findViewById(R.id.displayIt);
+        container.setVisibility(View.GONE);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,6 +126,18 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
+
+        //Création comportement du display d'itineraire
+        FrameLayout display = findViewById(R.id.displayIt);
+        behavior = BottomSheetBehavior.from(display);
+        behavior.setHideable(false);
+        behavior.setFitToContents(false);
+        behavior.setHalfExpandedRatio(0.35f);
+        float density = getResources().getDisplayMetrics().density;
+        int peekHeightInPixels = (int) (40 * density);
+        behavior.setPeekHeight(peekHeightInPixels);
+        behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
     }
 
     @Override
@@ -185,8 +226,9 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
         if (nbofgenItineraire == 0){
             Toast.makeText(this,"Aucun trajet trouvé",Toast.LENGTH_SHORT).show();
         } else {
-            DisplayItineraire display = new DisplayItineraire();
-            display.show(getSupportFragmentManager(), "displayitineraire");
+            openDisplay();
+            /*DisplayItineraire display = new DisplayItineraire();
+            display.show(getSupportFragmentManager(), "displayitineraire");*/
         }
 
     }
