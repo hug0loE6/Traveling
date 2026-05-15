@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback, TravelpathProperties.OnConfimProp {
+public class VueMap extends FragmentActivity implements OnMapReadyCallback, TravelpathProperties.OnConfimProp {
 
     private GoogleMap lamap;
     private List<Lieux> lesLieux = new ArrayList<>();
@@ -55,7 +55,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         Log.d("Firebase", output);
                     }
 
-                    BDDLieux bdd = BDDLieux.getInstance(MainActivity.this);
+                    BDDLieux bdd = BDDLieux.getInstance(VueMap.this);
                     LieuxDao dao = bdd.getDao();
                     dao.deleteAll();
                     Log.d("DEBUG_ROOM", "Nombre récupéré : " + firebaseLieux.size());
@@ -65,7 +65,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     }
 
                     runOnUiThread(() -> {
-                        MainActivity.this.lesLieux = firebaseLieux;
+                        VueMap.this.lesLieux = firebaseLieux;
                         createMarker();
                     });
                 }).start();
