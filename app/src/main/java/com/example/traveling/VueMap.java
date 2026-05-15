@@ -137,7 +137,7 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
         behavior.setFitToContents(false);
         behavior.setHalfExpandedRatio(0.35f);
         float density = getResources().getDisplayMetrics().density;
-        int peekHeightInPixels = (int) (40 * density);
+        int peekHeightInPixels = (int) (60 * density);
         behavior.setPeekHeight(peekHeightInPixels);
         behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 

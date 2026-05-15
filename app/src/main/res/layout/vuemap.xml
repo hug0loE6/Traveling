@@ -29,6 +29,7 @@
     <FrameLayout
         android:id="@+id/displayIt"
         android:layout_width="match_parent"
+        android:elevation="8dp"
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="true"
