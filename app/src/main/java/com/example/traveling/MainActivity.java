@@ -126,10 +126,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             List<Lieux> explorable = new ArrayList<>(lesLieux);
             explorable.remove(depart);
             itineraire.add(depart);
-            int remtime = data.duree;
+            int timetraj = 0;
             int rembud = data.budget;
 
-            while (!explorable.isEmpty() && remtime>0 && rembud>0) {
+            while (!explorable.isEmpty() && timetraj<data.duree && rembud>0) {
                 List<Distance> check = Distance.genToutDistance(itineraire.get(itineraire.size() - 1), explorable);
                 Log.d("DEBUT_DIST", check.toString());
                 double mindist = Double.POSITIVE_INFINITY;
@@ -147,14 +147,19 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 Distance nextstep = potentialnextstep.get(r.nextInt(potentialnextstep.size()));
                 explorable.remove(nextstep.to);
                 itineraire.add(nextstep.to);
-                remtime = (int) Math.round(remtime - nextstep.temps);
+                timetraj = (int) Math.round(timetraj + nextstep.temps);
                 rembud -= nextstep.to.budget;
+                if(timetraj > data.duree*0.67) break;
             }
             Log.d("ITINERAIRE", itineraire.toString());
             breakloop++;
-            if (breakloop >= 30) break;
+            if (breakloop >= 30) {
+                Toast.makeText(this,"Trop long",Toast.LENGTH_SHORT).show();
+                break;
+            }
             //check correspondance prop
-            if(((data.duree - remtime)*1.33) >= data.duree*1.33 || ((data.duree - remtime)*0.67) <= data.duree*0.67) continue;
+            Log.d("DEBUG_IT", "timetraj= " + timetraj + ", rembud= " + rembud);
+            if(!(data.duree*0.67 <= timetraj) || !(timetraj <= data.duree*1.33)) continue;
             if(rembud < 0) continue;
 
             break;
