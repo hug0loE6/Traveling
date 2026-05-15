@@ -81,7 +81,7 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.vuemap);
 
         //Chargement des lieux de la BDD (et init si premier lancement) dans la variable utilisé plus tard pour maps
         syncDataFirebase();
@@ -118,8 +118,10 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
     }
 
     private void genItineraire(PropertiesIt data) {
+        int nbofgenItineraire = 0;
+        List<Itineraire> optIti = new ArrayList<>();
         int breakloop = 0; //var de débug pour casser la boucle parce que j'ai 0 lieux de test vue que je suis un zgeg et que j'ai la giga flemme de mettre d'autre lieux de montpellier pour l'application traveling de l'UE Programmation mobile.
-        while (true){
+        while (nbofgenItineraire < 3){
             List<Lieux> itineraire = new ArrayList<>();
             List<String> obligatoirtodo = new ArrayList<>(data.lieux);
             Random r = new Random();
@@ -167,7 +169,6 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
             Log.d("ITINERAIRE", itineraire.toString());
             breakloop++;
             if (breakloop >= 67) {
-                Toast.makeText(this,"Aucun trajet trouvé",Toast.LENGTH_SHORT).show();
                 break;
             }
             //check correspondance prop
@@ -176,8 +177,18 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
             if(rembud < 0) continue;
             if(!obligatoirtodo.isEmpty()) continue;
 
-            break;
+            //Save itineraire
+            //TODO : faire un check si j'ai pas gen le même chemin
+            optIti.add(new Itineraire(data.budget-rembud,timetraj,itineraire));
+            nbofgenItineraire++;
         }
+        if (nbofgenItineraire == 0){
+            Toast.makeText(this,"Aucun trajet trouvé",Toast.LENGTH_SHORT).show();
+        } else {
+            DisplayItineraire display = new DisplayItineraire();
+            display.show(getSupportFragmentManager(), "displayitineraire");
+        }
+
     }
 
 
