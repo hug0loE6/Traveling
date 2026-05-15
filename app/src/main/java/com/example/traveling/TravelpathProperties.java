@@ -83,11 +83,18 @@ public class TravelpathProperties extends BottomSheetDialogFragment {
                             t.add(((Chip) caac).getText().toString());
                         }
                     }
+                    List<String> l = new ArrayList<>();
+                    for (int i = 0; i < chipLieu.getChildCount(); i++) {
+                        View caac = chipLieu.getChildAt(i);
+                        if (caac instanceof Chip) {
+                            l.add(((Chip) caac).getText().toString());
+                        }
+                    }
                     try {
                         PropertiesIt propchoosen = new PropertiesIt(
                                 Integer.parseInt(duration.getText().toString()),
                                 Integer.parseInt(budge.getText().toString()),
-                                t);
+                                t, l);
                         callback.onDataSent(propchoosen);
                         dismiss();
                     } catch (NumberFormatException e) {

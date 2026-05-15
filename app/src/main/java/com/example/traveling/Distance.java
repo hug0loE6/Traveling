@@ -15,6 +15,8 @@ public class Distance {
     public Distance(Lieux from, Lieux to) {
         this.from = from;
         this.to = to;
+        calculerDistance();
+        calculTemps();
     }
 
     @NonNull
@@ -45,18 +47,13 @@ public class Distance {
         temps = ((distance*1.15)/4)*60;
     }
 
-    public static List<Distance> genToutDistance(List<Lieux> mesLieux, Lieux from){
+    public static List<Distance> genToutDistance(Lieux from, List<Lieux> mesLieux){
         List<Distance> resultats = new ArrayList<>();
 
         for (int i = 0; i < mesLieux.size(); i++) {
             Lieux to = mesLieux.get(i);
             if (to == from) continue;
-
             Distance thedist = new Distance(from, to);
-
-            thedist.calculerDistance();
-            thedist.calculTemps();
-
             resultats.add(thedist);
         }
         return resultats;

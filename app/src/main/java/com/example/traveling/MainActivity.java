@@ -117,44 +117,55 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         lamap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.61093, 3.87635), 15f));
     }
 
-    private void genItineraire() {
-        List<Lieux> itineraire = new ArrayList<>();
-        Random r = new Random();
-        Lieux depart = lesLieux.get(r.nextInt(lesLieux.size()));
-        List<Lieux> explorable = new ArrayList<>(lesLieux);
-        explorable.remove(depart);
-        itineraire.add(depart);
+    private void genItineraire(PropertiesIt data) {
+        int breakloop = 0; //var de débug pour casser la boucle parce que j'ai 0 lieux de test vue que je suis un zgeg et que j'ai la giga flemme de mettre d'autre lieux de montpellier pour l'application traveling de l'UE Programmation mobile.
+        while (true){
+            List<Lieux> itineraire = new ArrayList<>();
+            Random r = new Random();
+            Lieux depart = lesLieux.get(r.nextInt(lesLieux.size()));
+            List<Lieux> explorable = new ArrayList<>(lesLieux);
+            explorable.remove(depart);
+            itineraire.add(depart);
+            int remtime = data.duree;
+            int rembud = data.budget;
 
-        while (!explorable.isEmpty()) {
-            List<Distance> check = Distance.genToutDistance(explorable, itineraire.get(itineraire.size()-1));
-            Log.d("DEBUT_DIST", check.toString());
-            double mindist = Double.POSITIVE_INFINITY;
-            int index = 0;
-            for (int i = 0; i<check.size();i++){
-                double disttest = check.get(i).distance;
-                if(disttest < mindist){
-                    mindist = disttest;
-                    index = i;
+            while (!explorable.isEmpty() && remtime>0 && rembud>0) {
+                List<Distance> check = Distance.genToutDistance(itineraire.get(itineraire.size() - 1), explorable);
+                Log.d("DEBUT_DIST", check.toString());
+                double mindist = Double.POSITIVE_INFINITY;
+                for (Distance dist : check) {
+                    if (dist.distance < mindist) {
+                        mindist = dist.distance;
+                    }
                 }
-            }
-            Lieux nextstep = new Lieux();
-            for(Lieux l : explorable){
-                if (check.get(index).to == l) {
-                    nextstep = check.get(index).to;
-                    break;
+                List<Distance> potentialnextstep = new ArrayList<>();
+                for (Distance d : check) {
+                    if (mindist * 1.25 > d.distance) {
+                        potentialnextstep.add(d);
+                    }
                 }
+                Distance nextstep = potentialnextstep.get(r.nextInt(potentialnextstep.size()));
+                explorable.remove(nextstep.to);
+                itineraire.add(nextstep.to);
+                remtime = (int) Math.round(remtime - nextstep.temps);
+                rembud -= nextstep.to.budget;
             }
-            explorable.remove(nextstep);
-            itineraire.add(nextstep);
+            Log.d("ITINERAIRE", itineraire.toString());
+            breakloop++;
+            if (breakloop >= 30) break;
+            //check correspondance prop
+            if(((data.duree - remtime)*1.33) >= data.duree*1.33 || ((data.duree - remtime)*0.67) <= data.duree*0.67) continue;
+            if(rembud < 0) continue;
+
+            break;
         }
-        Log.d("ITINERAIRE",itineraire.toString());
     }
 
 
     @Override
     public void onDataSent(PropertiesIt data) {
         Toast.makeText(this,"send",Toast.LENGTH_SHORT).show();
-        Log.d("TESTDATA", "d="+data.duree+",b="+data.budget+",t="+data.type);
-        genItineraire();
+        Log.d("TESTDATA", "d="+data.duree+",b="+data.budget+",t="+data.type+",l="+data.lieux);
+        genItineraire(data);
     }
 }

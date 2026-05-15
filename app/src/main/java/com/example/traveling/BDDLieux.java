@@ -7,7 +7,7 @@ import androidx.room.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Lieux.class}, version = 1)
+@Database(entities = {Lieux.class}, version = 2)
 public abstract class BDDLieux extends RoomDatabase {
     public abstract LieuxDao getDao();
     private static BDDLieux instance;
@@ -18,7 +18,9 @@ public abstract class BDDLieux extends RoomDatabase {
     public static synchronized BDDLieux getInstance(Context context) {
         if (instance == null) {
             instance = Room.databaseBuilder(context.getApplicationContext(),
-                            BDDLieux.class, "Lieux-BDD").build();
+                            BDDLieux.class, "Lieux-BDD")
+                    .fallbackToDestructiveMigration()
+                    .build();
         }
         return instance;
     }
