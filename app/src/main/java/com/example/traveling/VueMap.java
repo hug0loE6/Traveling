@@ -83,11 +83,14 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
         });
     }
 
-    public void openDisplay() {
+    public void openDisplay(ArrayList<Itineraire> theit) {
         FrameLayout container = findViewById(R.id.displayIt);
         container.setVisibility(View.VISIBLE);
         behavior.setHideable(false);
         DisplayItineraire fragment = new DisplayItineraire();
+        Bundle LEBENDEL = new Bundle();
+        LEBENDEL.putSerializable("ListIt", theit);
+        fragment.setArguments(LEBENDEL);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.displayIt, fragment)
                 .commit();
@@ -160,10 +163,10 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
 
     private void genItineraire(PropertiesIt data) {
         int nbofgenItineraire = 0;
-        List<Itineraire> optIti = new ArrayList<>();
+        ArrayList<Itineraire> optIti = new ArrayList<>();
         int breakloop = 0; //var de débug pour casser la boucle parce que j'ai 0 lieux de test vue que je suis un zgeg et que j'ai la giga flemme de mettre d'autre lieux de montpellier pour l'application traveling de l'UE Programmation mobile.
         while (nbofgenItineraire < 3){
-            List<Lieux> itineraire = new ArrayList<>();
+            ArrayList<Lieux> itineraire = new ArrayList<>();
             List<String> obligatoirtodo = new ArrayList<>(data.lieux);
             Random r = new Random();
             List<Lieux> filtered = new ArrayList<>();
@@ -218,17 +221,16 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
             if(rembud < 0) continue;
             if(!obligatoirtodo.isEmpty()) continue;
 
-            //Save itineraire
-            //TODO : faire un check si j'ai pas gen le même chemin
-            optIti.add(new Itineraire(data.budget-rembud,timetraj,itineraire));
+            //Check si double puis save itineraire
+            Itineraire it = new Itineraire(data.budget-rembud,timetraj,itineraire);
+            if(optIti.contains(it)) continue;
+            optIti.add(it);
             nbofgenItineraire++;
         }
         if (nbofgenItineraire == 0){
             Toast.makeText(this,"Aucun trajet trouvé",Toast.LENGTH_SHORT).show();
         } else {
-            openDisplay();
-            /*DisplayItineraire display = new DisplayItineraire();
-            display.show(getSupportFragmentManager(), "displayitineraire");*/
+            openDisplay(optIti);
         }
 
     }

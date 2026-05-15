@@ -2,10 +2,11 @@ package com.example.traveling;
 
 import androidx.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Distance {
+public class Distance implements Serializable {
 
     public Lieux from;
     public Lieux to;
