@@ -6,22 +6,23 @@ public class Post {
     private String description;
     private String location;
     private String period;
-    private int imageResId;
+
     private int avatarResId;
     private boolean liked = false;
+    private String imageUri;
 
     public Post(String username,
                 String description,
                 String location,
                 String period,
-                int imageResId,
+                String imageUri,
                 int avatarResId) {
 
         this.username = username;
         this.description = description;
         this.location = location;
         this.period = period;
-        this.imageResId = imageResId;
+        this.imageUri = imageUri;
         this.avatarResId = avatarResId;
     }
 
@@ -29,7 +30,7 @@ public class Post {
     public String getDescription() { return description; }
     public String getLocation() { return location; }
     public String getPeriod() { return period; }
-    public int getImageResId() { return imageResId; }
+    public String getImageUri() { return imageUri; }
     public int getAvatarResId() { return avatarResId; }
 
     public boolean isLiked() { return liked; }

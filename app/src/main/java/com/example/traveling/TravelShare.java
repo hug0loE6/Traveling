@@ -19,18 +19,16 @@ import java.util.ArrayList;
 public class TravelShare extends AppCompatActivity {
 
     private static final int LOGIN_REQUEST_CODE = 1;
-
     private boolean isLoggedIn = false;
     private String currentFirstname = null;
-
     private User currentUser = null;
-
     private ImageButton loginButton;
-
     private ImageButton pathbtn;
     private RecyclerView recyclerView;
     private ArrayList<Post> posts;
     private PostAdapter adapter;
+    private static final int PICK_IMAGE_REQUEST = 2;
+    private ImageButton addPostButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +76,17 @@ public class TravelShare extends AppCompatActivity {
 
         });
 
+        addPostButton = findViewById(R.id.addPostButton);
+
+        addPostButton.setOnClickListener(v -> {
+
+            if(!isLoggedIn) {
+                showAnonymousPopup();
+                return;
+            }
+
+            openGallery();
+        });
 
 
         // ===== RECYCLERVIEW FEED =====
@@ -92,7 +101,7 @@ public class TravelShare extends AppCompatActivity {
                 "Vue incroyable après 3h de randonnée.",
                 "Lac Blanc, Chamonix",
                 "Août 2024",
-                android.R.drawable.ic_menu_gallery,
+                null,
                 android.R.drawable.sym_def_app_icon
         ));
 
@@ -101,7 +110,7 @@ public class TravelShare extends AppCompatActivity {
                 "Petit café caché dans une rue magnifique.",
                 "Rome, Italie",
                 "Mai 2023",
-                android.R.drawable.ic_menu_camera,
+                null,
                 android.R.drawable.sym_def_app_icon
         ));
 
@@ -109,6 +118,23 @@ public class TravelShare extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
+    private void openGallery() {
+
+        if(!isLoggedIn) return;
+
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    private void showAnonymousPopup() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Mode anonyme")
+                .setMessage("Fonctionnalité indisponible en mode anonyme.")
+                .setPositiveButton("OK", null)
+                .show();
+    }
 
 
     // ===== RETOUR LOGIN =====
@@ -124,6 +150,24 @@ public class TravelShare extends AppCompatActivity {
             isLoggedIn = true;
 
             loginButton.setImageResource(android.R.drawable.sym_def_app_icon);
+        }
+        if(requestCode == PICK_IMAGE_REQUEST
+                && resultCode == RESULT_OK
+                && data != null) {
+
+            android.net.Uri imageUri = data.getData();
+
+            posts.add(0, new Post(
+                    currentFirstname,
+                    "Nouvelle aventure ✈️",
+                    "Lieu inconnu",
+                    "Aujourd'hui",
+                    imageUri.toString(),
+                    android.R.drawable.sym_def_app_icon
+            ));
+
+            adapter.notifyItemInserted(0);
+            recyclerView.scrollToPosition(0);
         }
     }
 }

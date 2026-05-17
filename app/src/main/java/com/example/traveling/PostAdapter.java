@@ -38,7 +38,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.locationText.setText("📍 " + post.getLocation());
         holder.dateText.setText(post.getPeriod());
         holder.avatarImage.setImageResource(post.getAvatarResId());
-        holder.postImage.setImageResource(post.getImageResId());
+        if (post.getImageUri() != null) {
+            holder.postImage.setImageURI(
+                    android.net.Uri.parse(post.getImageUri())
+            );
+        } else {
+            holder.postImage.setImageResource(
+                    android.R.drawable.ic_menu_gallery
+            );
+        }
 
 
         if(post.isLiked())
