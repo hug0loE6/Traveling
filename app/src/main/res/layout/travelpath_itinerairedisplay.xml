@@ -9,7 +9,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="10dp">
 
         <View
             android:layout_width="40dp"
@@ -26,21 +26,22 @@
             android:scaleType="centerInside"
             android:contentDescription="Fermer"
             android:src="@android:drawable/ic_menu_close_clear_cancel" />
-
     </RelativeLayout>
-    <TextView
-        android:id="@+id/title_text"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/optionIt"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Mon super Bottom Sheet"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Ce texte restera toujours visible dans les 200dp du bas." />
-
+        android:orientation="horizontal"
+        android:gravity="center">
+    </LinearLayout>
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>
