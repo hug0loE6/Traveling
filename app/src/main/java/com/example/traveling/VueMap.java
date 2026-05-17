@@ -18,18 +18,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.database.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 public class VueMap extends FragmentActivity implements OnMapReadyCallback, TravelpathProperties.OnConfimProp {
 
     private GoogleMap lamap;
+    private HashMap<String, Marker> mappingMarker = new HashMap<>();
     private List<Lieux> lesLieux = new ArrayList<>();
     private BottomSheetBehavior<FrameLayout> behavior;
 
@@ -38,10 +41,23 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
             Log.d("SYNCMARKER", "Status map : " + (lamap != null) + ", status liste Lieux : " + !lesLieux.isEmpty());
             return;
         }
+        mappingMarker.clear();
+
         for (Lieux l: lesLieux) {
             Log.d("AffichageLieux", l.toString());
             LatLng cord = new LatLng(l.lat, l.lng);
-            lamap.addMarker(new MarkerOptions().position(cord).title(l.nom));
+            Marker mark = lamap.addMarker(new MarkerOptions().position(cord).title(l.nom));
+            if (mark != null) mappingMarker.put(l.nom, mark);
+        }
+    }
+
+    public void showInfowindow(String l){
+        Marker mark = mappingMarker.get(l);
+        if (mark != null){
+            mark.showInfoWindow();
+            lamap.animateCamera(CameraUpdateFactory.newLatLngZoom(mark.getPosition(), 15f));
+        } else {
+            Log.e("MapClick", "Aucun marqueur trouvé pour le nom : " + l);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.traveling;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
@@ -116,12 +117,12 @@ public class DisplayItineraire extends Fragment {
                         Bundle bundle = new Bundle();
                         bundle.putInt("idopt", finalI);
                         getParentFragmentManager().setFragmentResult("sig", bundle);
-                        afficheItineraire(listeRecue.get(finalI-1));
+                        afficheItineraire(listeRecue.get(finalI-1), view);
                     });
 
                     if (i == 1) {
                         btn.setSelected(true);
-                        afficheItineraire(listeRecue.get(0));
+                        afficheItineraire(listeRecue.get(0), view);
                     }
                     layoutOptions.addView(btn);
                 }
@@ -129,9 +130,15 @@ public class DisplayItineraire extends Fragment {
         }
     }
 
-    private void afficheItineraire(Itineraire it){
+    private void afficheItineraire(Itineraire it, View laview){
         litineraire.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(getContext());
+        TextView bud = laview.findViewById(R.id.totalbud);
+        TextView tmp = laview.findViewById(R.id.totaltmp);
+        String budget = "Coût moyen de l'itineraire : " + it.totalBud + "€";
+        String temps = "Durée moyen de l'itineraire : " + it.timetraj + " minutes";
+        bud.setText(budget);
+        tmp.setText(temps);
         int nbLieux = it.lieuxIti.size();
         for(int i = 0; i < nbLieux; i++) {
             Lieux lieuActuel = it.lieuxIti.get(i);
@@ -158,6 +165,14 @@ public class DisplayItineraire extends Fragment {
             } else {
                 layoutTrajet.setVisibility(View.GONE);
             }
+            etapeView.setClickable(true);
+            etapeView.setFocusable(true);
+            etapeView.setOnClickListener(v-> {
+                if(getActivity() instanceof  VueMap){
+                    VueMap lemain = (VueMap) getActivity();
+                    lemain.showInfowindow(lieuActuel.nom);
+                }
+            });
             litineraire.addView(etapeView);
         }
     }
