@@ -26,6 +26,8 @@ public class TravelShare extends AppCompatActivity {
     private User currentUser = null;
 
     private ImageButton loginButton;
+
+    private ImageButton pathbtn;
     private RecyclerView recyclerView;
     private ArrayList<Post> posts;
     private PostAdapter adapter;
@@ -66,6 +68,17 @@ public class TravelShare extends AppCompatActivity {
                         .show();
             }
         });
+        //btnMap
+        pathbtn = findViewById(R.id.btnMap);
+
+        pathbtn.setOnClickListener(v -> {
+
+                Intent intent = new Intent(TravelShare.this, VueMap.class);
+                startActivity(intent);
+
+        });
+
+
 
         // ===== RECYCLERVIEW FEED =====
         recyclerView = findViewById(R.id.feedRecycler);

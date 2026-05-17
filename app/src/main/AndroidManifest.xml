@@ -16,6 +16,8 @@
         <activity
             android:name=".LoginActivity" />
 
+        <activity android:name=".VueMap"/>
+
         <activity
             android:name=".TravelShare"
             android:exported="true">
