@@ -15,7 +15,6 @@
 
         <activity
             android:name=".LoginActivity" />
-
         <activity
             android:name=".TravelShare"
             android:exported="true">
@@ -27,6 +26,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCaDEuDWydHVQ3zYEBeXosTnn54NNlJBYg" />
+        <activity android:name=".VueMap"/>
     </application>
 
 </manifest>

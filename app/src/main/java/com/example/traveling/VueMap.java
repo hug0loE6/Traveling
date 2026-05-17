@@ -1,5 +1,6 @@
 package com.example.traveling;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -139,6 +140,13 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
         prop.setOnClickListener(v ->{
             TravelpathProperties propriete = new TravelpathProperties();
             propriete.show(getSupportFragmentManager(), "propriete");
+        });
+
+        //Permet d'aller sur travelshare
+        ImageButton share = findViewById(R.id.btnShare);
+        share.setOnClickListener(v -> {
+            Intent i = new Intent(VueMap.this, TravelShare.class);
+            startActivity(i);
         });
 
         //Création de la Google Map sur un Fragment
