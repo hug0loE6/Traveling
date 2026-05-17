@@ -1,5 +1,6 @@
 package com.example.traveling;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,12 +32,33 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         Post post = postList.get(position);
 
         holder.usernameText.setText(post.getUsername());
-        holder.contentText.setText(post.getContent());
         holder.avatarImage.setImageResource(post.getAvatarResId());
+        holder.usernameText.setText(post.getUsername());
+        holder.contentText.setText(post.getDescription());
+        holder.locationText.setText("📍 " + post.getLocation());
+        holder.dateText.setText(post.getPeriod());
+        holder.avatarImage.setImageResource(post.getAvatarResId());
+        holder.postImage.setImageResource(post.getImageResId());
 
-        holder.locationText.setText(
-                post.getLocation() + " • " + post.getDate()
-        );
+
+        if(post.isLiked())
+            holder.likeButton.setText("❤️ Liked");
+        else
+            holder.likeButton.setText("🤍 Like");
+
+        holder.likeButton.setOnClickListener(v -> {
+            post.toggleLike();
+            notifyItemChanged(position);
+        });
+
+        holder.routeButton.setOnClickListener(v -> {
+
+            String uri = "geo:0,0?q=" + post.getLocation();
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uri));
+            intent.setPackage("com.google.android.apps.maps");
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override
@@ -51,6 +73,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         TextView contentText;
         TextView locationText;
 
+        TextView likeButton;
+        TextView dateText;
+        ImageView postImage;
+        TextView routeButton;
+
+
         public PostViewHolder(View itemView) {
             super(itemView);
 
@@ -58,6 +86,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             usernameText = itemView.findViewById(R.id.usernameText);
             contentText = itemView.findViewById(R.id.contentText);
             locationText = itemView.findViewById(R.id.locationText);
+            likeButton = itemView.findViewById(R.id.likeButton);
+            dateText = itemView.findViewById(R.id.dateText);
+            postImage = itemView.findViewById(R.id.postImage);
+            routeButton = itemView.findViewById(R.id.routeButton);
+
         }
     }
 }

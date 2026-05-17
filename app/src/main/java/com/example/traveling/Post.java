@@ -3,24 +3,38 @@ package com.example.traveling;
 public class Post {
 
     private String username;
-    private String content;
-    private int avatarResId;
-
-    // NEW (minimum viable travel app)
+    private String description;
     private String location;
-    private String date;
+    private String period;
+    private int imageResId;
+    private int avatarResId;
+    private boolean liked = false;
 
-    public Post(String username, String content, int avatarResId, String location, String date) {
+    public Post(String username,
+                String description,
+                String location,
+                String period,
+                int imageResId,
+                int avatarResId) {
+
         this.username = username;
-        this.content = content;
-        this.avatarResId = avatarResId;
+        this.description = description;
         this.location = location;
-        this.date = date;
+        this.period = period;
+        this.imageResId = imageResId;
+        this.avatarResId = avatarResId;
     }
 
     public String getUsername() { return username; }
-    public String getContent() { return content; }
-    public int getAvatarResId() { return avatarResId; }
+    public String getDescription() { return description; }
     public String getLocation() { return location; }
-    public String getDate() { return date; }
+    public String getPeriod() { return period; }
+    public int getImageResId() { return imageResId; }
+    public int getAvatarResId() { return avatarResId; }
+
+    public boolean isLiked() { return liked; }
+
+    public void toggleLike() {
+        liked = !liked;
+    }
 }

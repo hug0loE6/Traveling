@@ -76,18 +76,20 @@ public class TravelShare extends AppCompatActivity {
 
         posts.add(new Post(
                 "Alice",
-                "Premier post sur TravelShare !",
-                android.R.drawable.sym_def_app_icon,
-                "Paris, France",
-                "15/05/2026"
+                "Vue incroyable après 3h de randonnée.",
+                "Lac Blanc, Chamonix",
+                "Août 2024",
+                android.R.drawable.ic_menu_gallery,
+                android.R.drawable.sym_def_app_icon
         ));
 
         posts.add(new Post(
                 "Bob",
-                "Découverte d’un endroit incroyable.",
-                android.R.drawable.sym_def_app_icon,
+                "Petit café caché dans une rue magnifique.",
                 "Rome, Italie",
-                "12/05/2026"
+                "Mai 2023",
+                android.R.drawable.ic_menu_camera,
+                android.R.drawable.sym_def_app_icon
         ));
 
         adapter = new PostAdapter(posts);
