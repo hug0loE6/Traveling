@@ -1,22 +1,144 @@
 {
   "lieux": {
     "l1": {
-      "nom": "Place de la Comédie",
-      "type": "Culture",
+      "budget": 0,
       "lat": 43.6086,
-      "lng": 3.8797
+      "lng": 3.8797,
+      "nom": "Place de la Comédie",
+      "type": "Culture"
     },
     "l2": {
-      "nom": "Zoo de Montpellier",
-      "type": "Loisirs",
+      "budget": 0,
       "lat": 43.6433,
-      "lng": 3.8733
+      "lng": 3.8733,
+      "nom": "Zoo de Montpellier",
+      "type": "Loisirs"
     },
     "l3": {
-      "nom": "Le Bistrok Montpellier",
-      "type": "Restauration",
+      "budget": 20,
       "lat": 43.6121,
-      "lng": 3.8791
+      "lng": 3.8791,
+      "nom": "Le Bistrok Montpellier",
+      "type": "Restauration"
+    },
+    "l4": {
+      "budget": 0,
+      "lat": 43.6114,
+      "lng": 3.8736,
+      "nom": "Promenade du Peyrou",
+      "type": "Culture"
+    },
+    "l5": {
+      "budget": 9,
+      "lat": 43.6111,
+      "lng": 3.8802,
+      "nom": "Musée Fabre",
+      "type": "Culture"
+    },
+    "l6": {
+      "budget": 0,
+      "lat": 43.6133,
+      "lng": 3.8716,
+      "nom": "Jardin des Plantes",
+      "type": "Culture"
+    },
+    "l7": {
+      "budget": 0,
+      "lat": 43.6145,
+      "lng": 3.8794,
+      "nom": "Cathédrale Saint-Pierre",
+      "type": "Culture"
+    },
+    "l8": {
+      "budget": 0,
+      "lat": 43.6032,
+      "lng": 3.8791,
+      "nom": "MO.CO. (Montpellier Contemporain)",
+      "type": "Culture"
+    },
+    "l9": {
+      "budget": 7,
+      "lat": 43.6083,
+      "lng": 3.9181,
+      "nom": "Planet Ocean Montpellier",
+      "type": "Loisirs"
+    },
+    "l10": {
+      "budget": 0,
+      "lat": 43.6015,
+      "lng": 3.8962,
+      "nom": "Bassin Jacques Cœur",
+      "type": "Culture"
+    },
+    "l11": {
+      "budget": 12,
+      "lat": 43.6074,
+      "lng": 3.9195,
+      "nom": "Patinoire Vegapolis",
+      "type": "Loisirs"
+    },
+    "l12": {
+      "budget": 0,
+      "lat": 43.6185,
+      "lng": 3.8912,
+      "nom": "Parc de la Rimbaud",
+      "type": "Loisirs"
+    },
+    "l13": {
+      "budget": 0,
+      "lat": 43.6117,
+      "lng": 3.8774,
+      "nom": "Carré Sainte-Anne",
+      "type": "Culture"
+    },
+    "l14": {
+      "budget": 35,
+      "lat": 43.6105,
+      "lng": 3.8752,
+      "nom": "Le Petit Jardin",
+      "type": "Restauration"
+    },
+    "l15": {
+      "budget": 18,
+      "lat": 43.6091,
+      "lng": 3.8763,
+      "nom": "Les Demoiselles de Montpellier",
+      "type": "Restauration"
+    },
+    "l16": {
+      "budget": 22,
+      "lat": 43.6108,
+      "lng": 3.8725,
+      "nom": "Opéra Orchestre National Montpellier",
+      "type": "Culture"
+    },
+    "l17": {
+      "budget": 50,
+      "lat": 43.6119,
+      "lng": 3.8812,
+      "nom": "Le Terminal #1",
+      "type": "Restauration"
+    },
+    "l18": {
+      "budget": 12,
+      "lat": 43.6081,
+      "lng": 3.8749,
+      "nom": "Empanadas Club",
+      "type": "Restauration"
+    },
+    "l19": {
+      "budget": 20,
+      "lat": 43.6022,
+      "lng": 3.9118,
+      "nom": "Mad Monkey Montpellier",
+      "type": "Loisirs"
+    },
+    "l20": {
+      "budget": 0,
+      "lat": 43.6158,
+      "lng": 3.8805,
+      "nom": "Parc de la Guirlande",
+      "type": "Culture"
     }
   }
 }

@@ -22,7 +22,7 @@ public class Lieux implements Serializable {
     @NonNull
     @Override
     public String toString() {
-        return "Lieu{nom='" + nom + "', type='" + type + "', budget=" + budget + "', lat=" + lat + ", lng=" + lng + "}";
+        return "Lieu{nom='" + nom + "', type=" + type + ", budget=" + budget + ", lat=" + lat + ", lng=" + lng + "}";
     }
 
     @Override

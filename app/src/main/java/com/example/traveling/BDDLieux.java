@@ -7,7 +7,7 @@ import androidx.room.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Lieux.class}, version = 2)
+@Database(entities = {Lieux.class}, version = 4)
 public abstract class BDDLieux extends RoomDatabase {
     public abstract LieuxDao getDao();
     private static BDDLieux instance;

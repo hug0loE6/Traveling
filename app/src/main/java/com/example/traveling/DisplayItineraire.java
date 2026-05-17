@@ -2,6 +2,7 @@ package com.example.traveling;
 
 import androidx.fragment.app.Fragment;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.graphics.Color;
@@ -15,13 +16,18 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DisplayItineraire extends Fragment {
+
+    private LinearLayout litineraire;
 
     @Nullable
     @Override
@@ -42,6 +48,7 @@ public class DisplayItineraire extends Fragment {
 
 
                 ImageButton close = view.findViewById(R.id.btn_close);
+                litineraire = view.findViewById(R.id.affichageIt);
 
 
                 close.setOnClickListener(v -> {
@@ -109,14 +116,49 @@ public class DisplayItineraire extends Fragment {
                         Bundle bundle = new Bundle();
                         bundle.putInt("idopt", finalI);
                         getParentFragmentManager().setFragmentResult("sig", bundle);
+                        afficheItineraire(listeRecue.get(finalI-1));
                     });
 
                     if (i == 1) {
                         btn.setSelected(true);
+                        afficheItineraire(listeRecue.get(0));
                     }
                     layoutOptions.addView(btn);
                 }
             }
+        }
+    }
+
+    private void afficheItineraire(Itineraire it){
+        litineraire.removeAllViews();
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        int nbLieux = it.lieuxIti.size();
+        for(int i = 0; i < nbLieux; i++) {
+            Lieux lieuActuel = it.lieuxIti.get(i);
+            View etapeView = inflater.inflate(R.layout.etape, litineraire, false);
+            TextView tvNomLieu = etapeView.findViewById(R.id.tvNomLieu);
+            LinearLayout layoutTrajet = etapeView.findViewById(R.id.layoutTrajet);
+            TextView tvInfosTrajet = etapeView.findViewById(R.id.tvInfosTrajet);
+            tvNomLieu.setText(String.format(Locale.FRANCE,"%s (%s - %d€)", lieuActuel.nom, lieuActuel.type, lieuActuel.budget));
+            if (i < nbLieux - 1) {
+                Distance trajetSuivant = it.distancesIti.get(i);
+                if(trajetSuivant.distance > 1.1) {
+                    String infos = String.format(Locale.FRANCE, "↓ %.2f km (%d min)",
+                            trajetSuivant.distance,
+                            (int) trajetSuivant.temps);
+                    tvInfosTrajet.setText(infos);
+                }
+                else {
+                    int metres = (int) (trajetSuivant.distance * 1000);
+                    String infos = String.format(Locale.FRANCE, "↓ %d m (%d min)",
+                            metres, (int) trajetSuivant.temps);
+                    tvInfosTrajet.setText(infos);
+                }
+                layoutTrajet.setVisibility(View.VISIBLE);
+            } else {
+                layoutTrajet.setVisibility(View.GONE);
+            }
+            litineraire.addView(etapeView);
         }
     }
 }
