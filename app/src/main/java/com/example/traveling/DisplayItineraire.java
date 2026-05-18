@@ -63,11 +63,6 @@ public class DisplayItineraire extends Fragment {
         if (getArguments() != null) {
             listeRecue = (ArrayList<Itineraire>) getArguments().getSerializable("ListIt"); //ya un warning mais parce que android il est zgeg et dcp c'est pg ça marche en vrai
             if (listeRecue != null) {
-                for (Itineraire i : listeRecue) {
-                    Log.d("TEST_BENDEL", i.lieuxIti.toString());
-                }
-
-
                 ImageButton close = view.findViewById(R.id.btn_close);
                 litineraire = view.findViewById(R.id.affichageIt);
                 Button validation = view.findViewById(R.id.validate);

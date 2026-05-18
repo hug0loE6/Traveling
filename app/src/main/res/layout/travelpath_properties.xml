@@ -10,6 +10,7 @@
     <TextView
         android:text="Rechercher un itinéraire"
         android:textSize="18sp"
+        android:textColor="@color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"/>
@@ -27,6 +28,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 android:text="Lieu(x) obligatoire(s) :"
                 android:textSize="15sp"/>
 
@@ -45,6 +47,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 android:text="Type de d'activités voulu :"
                 android:textSize="15sp"/>
 

@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.core.view.GravityCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -34,18 +36,17 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
 
     private GoogleMap lamap;
     private HashMap<String, Marker> mappingMarker = new HashMap<>();
+    private DrawerLayout menuItineraire;
     private List<Lieux> lesLieux = new ArrayList<>();
     private BottomSheetBehavior<FrameLayout> behavior;
 
     private void createMarker(){
         if (lamap == null || lesLieux.isEmpty()){
-            Log.d("SYNCMARKER", "Status map : " + (lamap != null) + ", status liste Lieux : " + !lesLieux.isEmpty());
             return;
         }
         mappingMarker.clear();
 
         for (Lieux l: lesLieux) {
-            Log.d("AffichageLieux", l.toString());
             LatLng cord = new LatLng(l.lat, l.lng);
             Marker mark = lamap.addMarker(new MarkerOptions().position(cord).title(l.nom));
             if (mark != null) mappingMarker.put(l.nom, mark);
@@ -73,14 +74,11 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
                     for (DataSnapshot unLieu : snapshot.getChildren()) {
                         Lieux lieu = unLieu.getValue(Lieux.class);
                         firebaseLieux.add(lieu);
-                        String output = "Element lieux ajouté dans la liste firebase, value : " + lieu;
-                        Log.d("Firebase", output);
                     }
 
                     BDDLieux bdd = BDDLieux.getInstance(VueMap.this);
                     LieuxDao dao = bdd.getDao();
                     dao.deleteAll();
-                    Log.d("DEBUG_ROOM", "Nombre récupéré : " + firebaseLieux.size());
 
                     for (Lieux l : firebaseLieux) {
                         dao.insert(l);
@@ -165,6 +163,13 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
         behavior.setPeekHeight(peekHeightInPixels);
         behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
+        //Création du LayoutDrawer
+        menuItineraire = findViewById(R.id.drawerIt);
+        ImageButton btnOpenDrawer = findViewById(R.id.btnOpenDrawer);
+        ImageButton btnCloseDrawer = findViewById(R.id.btnCloseDrawer);
+        btnOpenDrawer.setOnClickListener(v -> menuItineraire.openDrawer(GravityCompat.START));
+        btnCloseDrawer.setOnClickListener(v -> menuItineraire.closeDrawer(GravityCompat.START));
+
     }
 
     @Override
@@ -207,7 +212,6 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
 
             while (!explorable.isEmpty() && timetraj<data.duree && rembud>0) {
                 List<Distance> check = Distance.genToutDistance(itineraire.get(itineraire.size() - 1), explorable);
-                Log.d("DEBUT_DIST", check.toString());
                 double mindist = Double.POSITIVE_INFINITY;
                 for (Distance dist : check) {
                     if (dist.distance < mindist) {
@@ -234,13 +238,11 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
                 rembud -= nextstep.to.budget;
                 if(timetraj > data.duree*0.67) break;
             }
-            Log.d("ITINERAIRE", itineraire.toString());
             breakloop++;
             if (breakloop >= 67) {
                 break;
             }
             //check correspondance prop
-            Log.d("DEBUG_IT", "timetraj= " + timetraj + ", rembud= " + rembud);
             if(!(data.duree*0.67 <= timetraj) || !(timetraj <= data.duree*1.33)) continue;
             if(rembud < 0) continue;
             if(!obligatoirtodo.isEmpty()) continue;
@@ -262,13 +264,12 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
 
     @Override
     public void onDataSent(PropertiesIt data) {
-        Toast.makeText(this,"send",Toast.LENGTH_SHORT).show();
-        Log.d("TESTDATA", "d="+data.duree+",b="+data.budget+",t="+data.type+",l="+data.lieux);
         genItineraire(data);
     }
 
     @Override
     public void onValidation(Itineraire it) {
         Log.d("ESSAIVALID",it.lieuxIti.toString());
+
     }
 }
