@@ -209,7 +209,10 @@ public class TravelShare extends AppCompatActivity {
                         String imageUrl = (String) resultData.get("secure_url");
                         Log.d("Cloudinary", "Succès ! URL de l'image : " + imageUrl);
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("images");
-                        DatabaseReference nouvelleImageRef = ref.push();
+                        long timestampActuel = System.currentTimeMillis();
+                        long timestampInverse = Long.MAX_VALUE - timestampActuel;
+                        String idInverse = String.valueOf(timestampInverse);
+                        DatabaseReference nouvelleImageRef = ref.child(idInverse);
                         Post nvpost = new Post(
                                 currentFirstname,
                                 description,
