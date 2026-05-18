@@ -1,5 +1,6 @@
 package com.example.traveling;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -31,6 +32,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DisplayItineraire extends Fragment {
 
+    public interface onValidateItineraire {
+        void onValidation(Itineraire it);
+    }
+
+    private onValidateItineraire callback;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            callback = (DisplayItineraire.onValidateItineraire) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context + " doit implémenter l'interface");
+        }
+    }
+
     private LinearLayout litineraire;
 
     @Nullable
@@ -53,6 +70,7 @@ public class DisplayItineraire extends Fragment {
 
                 ImageButton close = view.findViewById(R.id.btn_close);
                 litineraire = view.findViewById(R.id.affichageIt);
+                Button validation = view.findViewById(R.id.validate);
 
 
                 close.setOnClickListener(v -> {
@@ -129,6 +147,28 @@ public class DisplayItineraire extends Fragment {
                     }
                     layoutOptions.addView(btn);
                 }
+                //Validation d'un itineraire
+                validation.setOnClickListener(v ->{
+                    Context c = getContext();
+                    if(c != null) {
+                        new AlertDialog.Builder(getContext())
+                                .setTitle("Valider l'itineraire ?")
+                                .setMessage("Si vous confirmez votre choix, les autres options disparaîtront.")
+                                .setPositiveButton("Oui", (dialog, which) -> {
+                                    callback.onValidation(listeRecue.get(selectedIt.get()-1));
+                                    if (getActivity() instanceof VueMap) {
+                                        ((VueMap) getActivity()).closeDisplay();
+                                    }
+                                })
+                                .setNegativeButton("Non", (dialog, which) -> {
+                                    dialog.dismiss();
+                                })
+                                .setCancelable(true)
+                                .show();
+                    } else {
+                        throw new IllegalStateException("Context null.");
+                    }
+                });
             }
         }
     }
@@ -175,7 +215,6 @@ public class DisplayItineraire extends Fragment {
                     VueMap lemain = (VueMap) getActivity();
                     lemain.showInfowindow(lieuActuel.nom);
                     FrameLayout sheet = lemain.findViewById(R.id.displayIt);
-                    Log.d("PRINTVIEW", sheet.toString());
                     BottomSheetBehavior<FrameLayout> behavior = BottomSheetBehavior.from(sheet);
                     behavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
                 }

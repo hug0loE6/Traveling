@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-public class VueMap extends FragmentActivity implements OnMapReadyCallback, TravelpathProperties.OnConfimProp {
+public class VueMap extends FragmentActivity implements OnMapReadyCallback, TravelpathProperties.OnConfimProp, DisplayItineraire.onValidateItineraire {
 
     private GoogleMap lamap;
     private HashMap<String, Marker> mappingMarker = new HashMap<>();
@@ -265,5 +265,10 @@ public class VueMap extends FragmentActivity implements OnMapReadyCallback, Trav
         Toast.makeText(this,"send",Toast.LENGTH_SHORT).show();
         Log.d("TESTDATA", "d="+data.duree+",b="+data.budget+",t="+data.type+",l="+data.lieux);
         genItineraire(data);
+    }
+
+    @Override
+    public void onValidation(Itineraire it) {
+        Log.d("ESSAIVALID",it.lieuxIti.toString());
     }
 }
