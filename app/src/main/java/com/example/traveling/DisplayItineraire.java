@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -21,6 +22,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -171,6 +174,10 @@ public class DisplayItineraire extends Fragment {
                 if(getActivity() instanceof  VueMap){
                     VueMap lemain = (VueMap) getActivity();
                     lemain.showInfowindow(lieuActuel.nom);
+                    FrameLayout sheet = lemain.findViewById(R.id.displayIt);
+                    Log.d("PRINTVIEW", sheet.toString());
+                    BottomSheetBehavior<FrameLayout> behavior = BottomSheetBehavior.from(sheet);
+                    behavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
                 }
             });
             litineraire.addView(etapeView);

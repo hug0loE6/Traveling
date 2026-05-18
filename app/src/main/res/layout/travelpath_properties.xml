@@ -27,6 +27,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 android:text="Lieu(x) obligatoire(s) :"
                 android:textSize="15sp"/>
 
@@ -45,6 +46,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 android:text="Type de d'activités voulu :"
                 android:textSize="15sp"/>
 
