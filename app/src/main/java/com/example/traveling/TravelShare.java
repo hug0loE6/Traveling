@@ -33,6 +33,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.security.AlgorithmParameterGenerator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +55,8 @@ public class TravelShare extends AppCompatActivity {
     private ImageButton addPostButton;
     private Uri selectedImageUri;
     private Uri imageUri;
+
+    private ImageButton discoverBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +124,11 @@ public class TravelShare extends AppCompatActivity {
 
             openGallery();
         });
+        discoverBtn = findViewById(R.id.discoverBtn);
 
+        discoverBtn.setOnClickListener(v -> {
+            shuffleFeed();
+        });
 
         // ===== RECYCLERVIEW FEED =====
         recyclerView = findViewById(R.id.feedRecycler);
@@ -172,6 +179,19 @@ public class TravelShare extends AppCompatActivity {
                 .setMessage("Fonctionnalité indisponible en mode anonyme.")
                 .setPositiveButton("OK", null)
                 .show();
+    }
+
+    private void shuffleFeed() {
+
+        if(posts == null || posts.isEmpty()) return;
+
+        Collections.shuffle(posts);
+
+        adapter.notifyDataSetChanged();
+
+        Toast.makeText(this,
+                "Flux découverte activé 🎲",
+                Toast.LENGTH_SHORT).show();
     }
 
     private void showPostDialog() {
