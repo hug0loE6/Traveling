@@ -41,7 +41,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.avatarImage.setImageResource(post.getAvatarResId());
         if (post.getImageUri() != null) {
             if (post.getImageUri().startsWith("https://")) {//affichage depuis distant
-                Log.d("SALUTPD", post.getImageUri());
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -75,7 +74,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                     }
                 }).start();
             } else { //affichage depuis locale
-                Log.d("SALUTPD", post.getImageUri());
                 holder.postImage.setImageURI(
                         android.net.Uri.parse(post.getImageUri())
                 );
@@ -99,8 +97,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 currentPost.toggleLike();
                 notifyItemChanged(currentPosition);
             }
-
-            Log.d("SALUTFDP","caca");
         });
 
         holder.routeButton.setOnClickListener(v -> {

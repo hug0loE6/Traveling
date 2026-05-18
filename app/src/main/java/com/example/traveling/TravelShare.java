@@ -12,10 +12,14 @@ import android.widget.Toast;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -126,26 +130,30 @@ public class TravelShare extends AppCompatActivity {
 
         posts = new ArrayList<>();
 
-        posts.add(new Post(
-                "Alice",
-                "Vue incroyable après 3h de randonnée.",
-                "Lac Blanc, Chamonix",
-                "Août 2024",
-                null,
-                android.R.drawable.sym_def_app_icon
-        ));
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("images");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                new Thread(() -> {
+                    ArrayList<Post> allposts = new ArrayList<>();
+                    for (DataSnapshot unpost : snapshot.getChildren()){
+                        Post thepost = unpost.getValue(Post.class);
+                        allposts.add(thepost);
+                    }
+                    runOnUiThread(() -> {
+                        posts.clear();
+                        posts.addAll(allposts);
+                        adapter = new PostAdapter(posts);
+                        recyclerView.setAdapter(adapter);
+                    });
+                }).start();
+            }
 
-        posts.add(new Post(
-                "Bob",
-                "Petit café caché dans une rue magnifique.",
-                "Rome, Italie",
-                "Mai 2023",
-                null,
-                android.R.drawable.sym_def_app_icon
-        ));
-
-        adapter = new PostAdapter(posts);
-        recyclerView.setAdapter(adapter);
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Firebase", "Erreur de sync", error.toException());
+            }
+        });
     }
 
     private void openGallery() {
@@ -202,22 +210,16 @@ public class TravelShare extends AppCompatActivity {
                         Log.d("Cloudinary", "Succès ! URL de l'image : " + imageUrl);
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("images");
                         DatabaseReference nouvelleImageRef = ref.push();
-
+                        Post nvpost = new Post(
+                                currentFirstname,
+                                description,
+                                location,
+                                date,
+                                imageUrl,
+                                android.R.drawable.sym_def_app_icon
+                        );
+                        nouvelleImageRef.setValue(nvpost);
                         runOnUiThread(() -> {
-
-                            Post nvpost = new Post(
-                                    currentFirstname,
-                                    description,
-                                    location,
-                                    date,
-                                    imageUrl,
-                                    android.R.drawable.sym_def_app_icon
-                            );
-
-                            posts.add(0, nvpost);
-                            adapter.notifyItemInserted(0);
-                            recyclerView.scrollToPosition(0);
-
                             Toast.makeText(TravelShare.this,
                                     "Post créé !",
                                     Toast.LENGTH_SHORT).show();
