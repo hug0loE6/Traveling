@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.cloudinary.android.MediaManager;
@@ -46,6 +48,8 @@ public class TravelShare extends AppCompatActivity {
     private PostAdapter adapter;
     private static final int PICK_IMAGE_REQUEST = 2;
     private ImageButton addPostButton;
+    private Uri selectedImageUri;
+    private Uri imageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,6 +166,72 @@ public class TravelShare extends AppCompatActivity {
                 .show();
     }
 
+    private void showPostDialog() {
+
+        View view = getLayoutInflater().inflate(R.layout.dialog_post, null);
+
+        EditText descriptionInput = view.findViewById(R.id.descriptionInput);
+        EditText locationInput = view.findViewById(R.id.locationInput);
+        EditText dateInput = view.findViewById(R.id.dateInput);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Créer un post")
+                .setView(view)
+                .setPositiveButton("Publier", (dialog, which) -> {
+
+                    uploadPost(
+                            descriptionInput.getText().toString(),
+                            locationInput.getText().toString(),
+                            dateInput.getText().toString()
+                    );
+                })
+                .setNegativeButton("Annuler", null)
+                .show();
+    }
+
+    private void uploadPost(String description, String location, String date) {
+
+        MediaManager.get().upload(selectedImageUri)
+                .unsigned(UPLOAD_PRESET)
+                .callback(new UploadCallback() {
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+
+                        String imageUrl = (String) resultData.get("secure_url");
+                        Log.d("Cloudinary", "Succès ! URL de l'image : " + imageUrl);
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("images");
+                        DatabaseReference nouvelleImageRef = ref.push();
+
+                        runOnUiThread(() -> {
+
+                            Post nvpost = new Post(
+                                    currentFirstname,
+                                    description,
+                                    location,
+                                    date,
+                                    imageUrl,
+                                    android.R.drawable.sym_def_app_icon
+                            );
+
+                            posts.add(0, nvpost);
+                            adapter.notifyItemInserted(0);
+                            recyclerView.scrollToPosition(0);
+
+                            Toast.makeText(TravelShare.this,
+                                    "Post créé !",
+                                    Toast.LENGTH_SHORT).show();
+                        });
+                    }
+
+                    @Override public void onStart(String requestId) {}
+                    @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
+                    @Override public void onError(String requestId, ErrorInfo error) {}
+                    @Override public void onReschedule(String requestId, ErrorInfo error) {}
+                })
+                .dispatch();
+    }
+
 
     // ===== RETOUR LOGIN =====
     @Override
@@ -181,79 +251,9 @@ public class TravelShare extends AppCompatActivity {
                 && resultCode == RESULT_OK
                 && data != null) {
 
-            Uri imageUri = data.getData();
-
-            Post nvpost =  new Post(
-                    currentFirstname,
-                    "Nouvelle aventure ✈️",
-                    "Lieu inconnu",
-                    "Aujourd'hui",
-                    imageUri.toString(),
-                    android.R.drawable.sym_def_app_icon
-            );
-
-            posts.add(0, nvpost);
-
-            adapter.notifyItemInserted(0);
-            recyclerView.scrollToPosition(0);
-
-            //upload image to database cloudinary
-            try {
-                // 2. Ouvrir un InputStream à partir de l'Uri
-                InputStream inputStream = getContentResolver().openInputStream(imageUri);
-
-                // 3. Lancer l'upload via le MediaManager
-                MediaManager.get().upload(imageUri)
-                        .unsigned(UPLOAD_PRESET) // Utilisation du preset non signé
-                        .callback(new UploadCallback() {
-                            @Override
-                            public void onStart(String requestId) {
-                                Log.d("Cloudinary", "Début de l'upload...");
-                            }
-
-                            @Override
-                            public void onProgress(String requestId, long bytes, long totalBytes) {
-                                // Optionnel : Calculer la progression
-                            }
-
-                            @Override
-                            public void onSuccess(String requestId, Map resultData) {
-                                // 4. L'upload a réussi ! On récupère l'URL ici
-                                String imageUrl = (String) resultData.get("secure_url");
-                                Log.d("Cloudinary", "Succès ! URL de l'image : " + imageUrl);
-                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("images");
-                                DatabaseReference nouvelleImageRef = ref.push();
-                                nvpost.setImageUri(imageUrl);
-                                nouvelleImageRef.setValue(nvpost)
-                                        .addOnSuccessListener(aVoid -> {
-                                            Log.d("Firebase", "URL enregistrée avec succès !");
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.e("Firebase", "Erreur d'enregistrement : " + e.getMessage());
-                                        });
-
-                                // Vous pouvez maintenant utiliser cette URL (ex: l'enregistrer en BDD)
-                                runOnUiThread(() -> {
-                                    Toast.makeText(TravelShare.this, "Image uploadée avec succès !", Toast.LENGTH_SHORT).show();
-                                });
-                            }
-
-                            @Override
-                            public void onError(String requestId, ErrorInfo error) {
-                                Log.e("Cloudinary", "Erreur d'upload : " + error.getDescription());
-                            }
-
-                            @Override
-                            public void onReschedule(String requestId, ErrorInfo error) {
-                                // En cas de coupure réseau, Cloudinary replanifiera l'upload
-                            }
-                        })
-                        .dispatch(); // Lance l'envoi en arrière-plan
-            } catch (FileNotFoundException e) {
-                Toast.makeText(this, "Impossible de lire le fichier de l'image", Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+            selectedImageUri = data.getData();
+            showPostDialog();
+            imageUri = selectedImageUri;
         }
     }
 }
