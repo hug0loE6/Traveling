@@ -1,11 +1,26 @@
 package com.example.traveling;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -14,23 +29,31 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.widget.ImageButton;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.security.AlgorithmParameterGenerator;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TravelShare extends AppCompatActivity {
 
-    private static final int LOGIN_REQUEST_CODE = 1;
+    private static final String CLOUD_NAME = "dfx1vuhqf";
+    private static final String UPLOAD_PRESET = "testla";
 
+    private static final int LOGIN_REQUEST_CODE = 1;
     private boolean isLoggedIn = false;
     private String currentFirstname = null;
-
     private User currentUser = null;
-
     private ImageButton loginButton;
-
     private ImageButton pathbtn;
     private RecyclerView recyclerView;
     private ArrayList<Post> posts;
     private PostAdapter adapter;
+    private static final int PICK_IMAGE_REQUEST = 2;
+    private ImageButton addPostButton;
+    private Uri selectedImageUri;
+    private Uri imageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +67,15 @@ public class TravelShare extends AppCompatActivity {
             return insets;
         });
 
+        //log cloudinary
+        try {
+            Map<String, String> config = new HashMap<>();
+            config.put("cloud_name", CLOUD_NAME);
+            config.put("secure", "true");
+            MediaManager.init(this, config);
+        } catch (IllegalStateException ignored) {
+        }
+
         // ===== BOUTON CONNEXION =====
         loginButton = findViewById(R.id.loginButton);
 
@@ -56,7 +88,7 @@ public class TravelShare extends AppCompatActivity {
 
             } else {
 
-                new androidx.appcompat.app.AlertDialog.Builder(TravelShare.this)
+                new AlertDialog.Builder(TravelShare.this)
                         .setTitle("Déconnexion")
                         .setMessage("Voulez-vous vous déconnecter ?")
                         .setPositiveButton("Oui", (dialog, which) -> {
@@ -78,6 +110,17 @@ public class TravelShare extends AppCompatActivity {
 
         });
 
+        addPostButton = findViewById(R.id.addPostButton);
+
+        addPostButton.setOnClickListener(v -> {
+
+            if(!isLoggedIn) {
+                showAnonymousPopup();
+                return;
+            }
+
+            openGallery();
+        });
 
 
         // ===== RECYCLERVIEW FEED =====
@@ -87,28 +130,112 @@ public class TravelShare extends AppCompatActivity {
 
         posts = new ArrayList<>();
 
-        posts.add(new Post(
-                "Alice",
-                "Vue incroyable après 3h de randonnée.",
-                "Lac Blanc, Chamonix",
-                "Août 2024",
-                android.R.drawable.ic_menu_gallery,
-                android.R.drawable.sym_def_app_icon
-        ));
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("images");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                new Thread(() -> {
+                    ArrayList<Post> allposts = new ArrayList<>();
+                    for (DataSnapshot unpost : snapshot.getChildren()){
+                        Post thepost = unpost.getValue(Post.class);
+                        allposts.add(thepost);
+                    }
+                    runOnUiThread(() -> {
+                        posts.clear();
+                        posts.addAll(allposts);
+                        adapter = new PostAdapter(posts);
+                        recyclerView.setAdapter(adapter);
+                    });
+                }).start();
+            }
 
-        posts.add(new Post(
-                "Bob",
-                "Petit café caché dans une rue magnifique.",
-                "Rome, Italie",
-                "Mai 2023",
-                android.R.drawable.ic_menu_camera,
-                android.R.drawable.sym_def_app_icon
-        ));
-
-        adapter = new PostAdapter(posts);
-        recyclerView.setAdapter(adapter);
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Firebase", "Erreur de sync", error.toException());
+            }
+        });
     }
 
+    private void openGallery() {
+
+        if(!isLoggedIn) return;
+
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    private void showAnonymousPopup() {
+        new AlertDialog.Builder(this)
+                .setTitle("Mode anonyme")
+                .setMessage("Fonctionnalité indisponible en mode anonyme.")
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private void showPostDialog() {
+
+        View view = getLayoutInflater().inflate(R.layout.dialog_post, null);
+
+        EditText descriptionInput = view.findViewById(R.id.descriptionInput);
+        EditText locationInput = view.findViewById(R.id.locationInput);
+        EditText dateInput = view.findViewById(R.id.dateInput);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Créer un post")
+                .setView(view)
+                .setPositiveButton("Publier", (dialog, which) -> {
+
+                    uploadPost(
+                            descriptionInput.getText().toString(),
+                            locationInput.getText().toString(),
+                            dateInput.getText().toString()
+                    );
+                })
+                .setNegativeButton("Annuler", null)
+                .show();
+    }
+
+    private void uploadPost(String description, String location, String date) {
+
+        MediaManager.get().upload(selectedImageUri)
+                .unsigned(UPLOAD_PRESET)
+                .callback(new UploadCallback() {
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+
+                        String imageUrl = (String) resultData.get("secure_url");
+                        Log.d("Cloudinary", "Succès ! URL de l'image : " + imageUrl);
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("images");
+                        long timestampActuel = System.currentTimeMillis();
+                        long timestampInverse = Long.MAX_VALUE - timestampActuel;
+                        String idInverse = String.valueOf(timestampInverse);
+                        DatabaseReference nouvelleImageRef = ref.child(idInverse);
+                        Post nvpost = new Post(
+                                currentFirstname,
+                                description,
+                                location,
+                                date,
+                                imageUrl,
+                                android.R.drawable.sym_def_app_icon
+                        );
+                        nouvelleImageRef.setValue(nvpost);
+                        runOnUiThread(() -> {
+                            Toast.makeText(TravelShare.this,
+                                    "Post créé !",
+                                    Toast.LENGTH_SHORT).show();
+                        });
+                    }
+
+                    @Override public void onStart(String requestId) {}
+                    @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
+                    @Override public void onError(String requestId, ErrorInfo error) {}
+                    @Override public void onReschedule(String requestId, ErrorInfo error) {}
+                })
+                .dispatch();
+    }
 
 
     // ===== RETOUR LOGIN =====
@@ -124,6 +251,14 @@ public class TravelShare extends AppCompatActivity {
             isLoggedIn = true;
 
             loginButton.setImageResource(android.R.drawable.sym_def_app_icon);
+        }
+        if(requestCode == PICK_IMAGE_REQUEST
+                && resultCode == RESULT_OK
+                && data != null) {
+
+            selectedImageUri = data.getData();
+            showPostDialog();
+            imageUri = selectedImageUri;
         }
     }
 }

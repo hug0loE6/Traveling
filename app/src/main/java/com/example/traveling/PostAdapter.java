@@ -1,6 +1,7 @@
 package com.example.traveling;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     @Override
     public void onBindViewHolder(PostViewHolder holder, int position) {
 
-        Post post = postList.get(position);
+        Post post = postList.get(holder.getBindingAdapterPosition());
 
         holder.usernameText.setText(post.getUsername());
         holder.avatarImage.setImageResource(post.getAvatarResId());
@@ -38,7 +39,50 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.locationText.setText("📍 " + post.getLocation());
         holder.dateText.setText(post.getPeriod());
         holder.avatarImage.setImageResource(post.getAvatarResId());
-        holder.postImage.setImageResource(post.getImageResId());
+        if (post.getImageUri() != null) {
+            if (post.getImageUri().startsWith("https://")) {//affichage depuis distant
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            // Téléchargement des pixels bruts depuis l'URL Cloudinary
+                            java.net.URL url = new java.net.URL(post.getImageUri());
+                            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+                            connection.setDoInput(true);
+                            connection.connect();
+                            java.io.InputStream input = connection.getInputStream();
+                            final android.graphics.Bitmap myBitmap = android.graphics.BitmapFactory.decodeStream(input);
+
+                            // 2. On retourne sur le fil principal pour afficher le Bitmap dans l'ImageView
+                            holder.postImage.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    holder.postImage.setImageBitmap(myBitmap);
+                                }
+                            });
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            // En cas d'erreur (pas d'internet, etc.), on met l'image par défaut
+                            holder.postImage.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    holder.postImage.setImageResource(android.R.drawable.ic_menu_gallery);
+                                }
+                            });
+                        }
+                    }
+                }).start();
+            } else { //affichage depuis locale
+                holder.postImage.setImageURI(
+                        android.net.Uri.parse(post.getImageUri())
+                );
+            }
+        } else {
+            holder.postImage.setImageResource(
+                    android.R.drawable.ic_menu_gallery
+            );
+        }
 
 
         if(post.isLiked())
@@ -47,8 +91,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             holder.likeButton.setText("🤍 Like");
 
         holder.likeButton.setOnClickListener(v -> {
-            post.toggleLike();
-            notifyItemChanged(position);
+            int currentPosition = holder.getBindingAdapterPosition();
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                Post currentPost = postList.get(currentPosition);
+                currentPost.toggleLike();
+                notifyItemChanged(currentPosition);
+            }
         });
 
         holder.routeButton.setOnClickListener(v -> {

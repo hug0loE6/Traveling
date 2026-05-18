@@ -28,6 +28,13 @@
             android:background="@null"
             android:src="@android:drawable/ic_menu_add"
             android:scaleType="centerCrop"/>
+        <ImageButton
+            android:id="@+id/addPostButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:background="@null"
+            android:src="@android:drawable/ic_menu_camera"/>
     </RelativeLayout>
 
     <!-- FEED -->
