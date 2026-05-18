@@ -11,6 +11,8 @@ public class Post {
     private boolean liked = false;
     private String imageUri;
 
+
+    public Post(){};
     public Post(String username,
                 String description,
                 String location,

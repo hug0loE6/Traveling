@@ -10,10 +10,14 @@ import android.widget.Toast;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -142,6 +146,31 @@ public class TravelShare extends AppCompatActivity {
 
         adapter = new PostAdapter(posts);
         recyclerView.setAdapter(adapter);
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("images");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                new Thread(() -> {
+                    ArrayList<Post> allposts = new ArrayList<>();
+                    for (DataSnapshot unpost : snapshot.getChildren()){
+                        Post thepost = unpost.getValue(Post.class);
+                        allposts.add(thepost);
+                    }
+                    runOnUiThread(() -> {
+                        posts.clear();
+                        posts.addAll(allposts);
+                        adapter = new PostAdapter(posts);
+                        recyclerView.setAdapter(adapter);
+                    });
+                }).start();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Firebase", "Erreur de sync", error.toException());
+            }
+        });
     }
 
     private void openGallery() {
@@ -199,9 +228,6 @@ public class TravelShare extends AppCompatActivity {
 
             //upload image to database cloudinary
             try {
-                // 2. Ouvrir un InputStream à partir de l'Uri
-                InputStream inputStream = getContentResolver().openInputStream(imageUri);
-
                 // 3. Lancer l'upload via le MediaManager
                 MediaManager.get().upload(imageUri)
                         .unsigned(UPLOAD_PRESET) // Utilisation du preset non signé
