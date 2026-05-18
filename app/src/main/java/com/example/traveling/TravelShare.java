@@ -183,14 +183,16 @@ public class TravelShare extends AppCompatActivity {
 
             Uri imageUri = data.getData();
 
-            posts.add(0, new Post(
+            Post nvpost =  new Post(
                     currentFirstname,
                     "Nouvelle aventure ✈️",
                     "Lieu inconnu",
                     "Aujourd'hui",
                     imageUri.toString(),
                     android.R.drawable.sym_def_app_icon
-            ));
+            );
+
+            posts.add(0, nvpost);
 
             adapter.notifyItemInserted(0);
             recyclerView.scrollToPosition(0);
@@ -221,7 +223,8 @@ public class TravelShare extends AppCompatActivity {
                                 Log.d("Cloudinary", "Succès ! URL de l'image : " + imageUrl);
                                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference("images");
                                 DatabaseReference nouvelleImageRef = ref.push();
-                                nouvelleImageRef.setValue(imageUrl)
+                                nvpost.setImageUri(imageUrl);
+                                nouvelleImageRef.setValue(nvpost)
                                         .addOnSuccessListener(aVoid -> {
                                             Log.d("Firebase", "URL enregistrée avec succès !");
                                         })

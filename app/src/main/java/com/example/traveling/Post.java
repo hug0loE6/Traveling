@@ -31,6 +31,7 @@ public class Post {
     public String getLocation() { return location; }
     public String getPeriod() { return period; }
     public String getImageUri() { return imageUri; }
+    public void setImageUri(String image) {imageUri=image;}
     public int getAvatarResId() { return avatarResId; }
 
     public boolean isLiked() { return liked; }
